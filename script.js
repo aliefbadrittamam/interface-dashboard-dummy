@@ -158,7 +158,8 @@ function updateClock() {
     const now = new Date();
     const clockEl = document.getElementById('clock');
     if (clockEl) {
-        clockEl.textContent = now.toLocaleTimeString('en-GB') + ' UTC';
+        const wib = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Jakarta' });
+        clockEl.textContent = wib + ' WIB';
     }
 }
 setInterval(updateClock, 1000);
