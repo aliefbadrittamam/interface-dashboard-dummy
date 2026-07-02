@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL-X IoT Test Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0c10;
+            color: #e1e2ec;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 { color: #adc6ff; border-bottom: 2px solid #363941; padding-bottom: 10px; margin-bottom: 20px; font-size: 24px; }
+        .subtitle { color: #8b919c; margin-bottom: 30px; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        .panel {
+            background: #1a1d24; border: 1px solid #363941; border-radius: 8px;
+            padding: 20px; margin-bottom: 20px;
+        }
+        .panel h2 {
+            color: #adc6ff; font-size: 14px; margin: 0 0 15px 0;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            border-bottom: 1px solid #363941; padding-bottom: 10px;
+        }
+        .btn {
+            display: inline-block; padding: 8px 16px; margin: 4px;
+            border: 1px solid #363941; border-radius: 6px;
+            background: #14171c; color: #e1e2ec;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn:hover { border-color: #adc6ff; color: #adc6ff; }
+        .btn-ok { border-color: #589e6e; color: #a7f3c5; }
+        .btn-ok:hover { background: rgba(88, 158, 110, 0.2); }
+        .btn-danger { border-color: #c45a5a; color: #ffb4ab; }
+        .btn-danger:hover { background: rgba(196, 90, 90, 0.2); }
+        .console {
+            background: #0a0c10; border: 1px solid #363941; border-radius: 6px;
+            padding: 10px; font-family: 'JetBrains Mono', monospace;
+            font-size: 11px; max-height: 150px; overflow-y: auto; margin-top: 10px;
+        }
+        .console .entry { margin: 2px 0; color: #8b919c; }
+        .console .entry.ok { color: #589e6e; }
+        .console .entry.warn { color: #cda434; }
+        .console .entry.danger { color: #c45a5a; }
+        .state-box {
+            background: #14171c; border: 1px solid #363941; border-radius: 6px;
+            padding: 15px; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; line-height: 1.8; max-height: 300px; overflow-y: auto;
+        }
+        .state-box .k { color: #8b919c; }
+        .state-box .v { color: #e1e2ec; }
+        .state-box .bt { color: #589e6e; }
+        .state-box .bf { color: #c45a5a; }
+        .state-box .num { color: #ffb786; }
+        .state-box .str { color: #a7b6cc; }
+        .preview { width: 100%; height: 400px; border: 2px solid #363941; border-radius: 8px; }
+        .code-box {
+            background: #0a0c10; border: 1px solid #363941; border-radius: 6px;
+            padding: 15px; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; overflow-x: auto; line-height: 1.6; white-space: pre-wrap;
+        }
+        .code-box .c { color: #6b7180; }
+        .code-box .k { color: #c2c6d6; }
+        .code-box .s { color: #a7b6cc; }
+        .code-box .f { color: #ffb786; }
+    </style>
+</head>
+<body>
+    <h1>SENTINEL-X IoT Test Simulator</h1>
+    <p class="subtitle">Gunakan panel ini untuk mensimulasikan data sensor sebelum koneksi hardware IoT sungguhan.</p>
+
+    <div class="grid">
+        <!-- Simulator Controls -->
+        <div>
+            <div class="panel">
+                <h2>Node 1 - Pintu</h2>
+                <button class="btn btn-ok" onclick="simDoor('unlocked')">Buka Pintu</button>
+                <button class="btn btn-danger" onclick="simDoor('locked')">Kunci Pintu</button>
+                <button class="btn" onclick="simRFID('83A12F9B', 'Ahmad', true)">RFID Valid</button>
+                <button class="btn btn-danger" onclick="simRFID('UNKNOWN', 'Unknown', false)">RFID Invalid</button>
+                <div class="console" id="log-n1"></div>
+            </div>
+            <div class="panel">
+                <h2>Node 2 - Gas & Motion</h2>
+                <button class="btn btn-ok" onclick="simGas(245)">Gas Safe (245 PPM)</button>
+                <button class="btn btn-danger" onclick="simGas(450)">Gas Danger (450 PPM)</button>
+                <button class="btn btn-danger" onclick="simGas(600)">Gas Critical (600 PPM)</button>
+                <button class="btn btn-ok" onclick="simGas(150)">Gas Low (150 PPM)</button>
+                <button class="btn" onclick="simMotion(true)">Motion Detect</button>
+                <button class="btn" onclick="simMotion(false)">Motion Clear</button>
+                <div class="console" id="log-n2"></div>
+            </div>
+            <div class="panel">
+                <h2>Node 3 - Kontrol</h2>
+                <button class="btn btn-ok" onclick="simLight('living', true)">Living ON</button>
+                <button class="btn btn-danger" onclick="simLight('living', false)">Living OFF</button>
+                <button class="btn btn-ok" onclick="simLight('porch', true)">Porch ON</button>
+                <button class="btn btn-danger" onclick="simLight('porch', false)">Porch OFF</button>
+                <button class="btn btn-danger" onclick="simAlarm(true)">Trigger Alarm</button>
+                <button class="btn btn-ok" onclick="simAlarm(false)">Alarm Off</button>
+                <div class="console" id="log-n3"></div>
+            </div>
+            <div class="panel">
+                <h2>Server Status</h2>
+                <button class="btn btn-ok" onclick="simServer('online')">Online</button>
+                <button class="btn btn-danger" onclick="simServer('offline')">Offline</button>
+                <div class="console" id="log-srv"></div>
+            </div>
+        </div>
+
+        <!-- Monitor & Preview -->
+        <div>
+            <div class="panel">
+                <h2>Real-time State Monitor</h2>
+                <div class="state-box" id="state-mon">
+                    Loading state...
+                </div>
+            </div>
+            <div class="panel">
+                <h2>Dashboard Preview</h2>
+                <iframe class="preview" src="index.html" id="dash-preview"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration Code Template -->
+    <div class="panel">
+        <h2>Template Kode Integrasi IoT (Firebase/MQTT)</h2>
+        <p class="subtitle">Copy template ini untuk teman backend Anda.</p>
+        <div class="code-box">
+<span class="c">// firebase-integration.js</span>
+<span class="c">// Copy ini ke file baru dan sesuaikan konfigurasi</span>
+
+<span class="k">import</span> { initializeApp } <span class="k">from</span> <span class="s">"firebase/app"</span>;
+<span class="k">import</span> { getDatabase, ref, onValue, set } <span class="k">from</span> <span class="s">"firebase/database"</span>;
+
+<span class="c">// Konfigurasi Firebase (ganti dengan config project Anda)</span>
+<span class="k">const</span> firebaseConfig = {
+    apiKey: <span class="s">"YOUR_API_KEY"</span>,
+    databaseURL: <span class="s">"https://your-project.firebaseio.com"</span>,
+    <span class="c">// ... config lainnya</span>
+};
+
+<span class="k">const</span> app = <f>initializeApp</f>(firebaseConfig);
+<span class="k">const</span> db = <f>getDatabase</f>(app);
+
+<span class="c">// Listener Node 1 (Pintu)</span>
+<f>onValue</f>(<f>ref</f>(db, <span class="s">'node1'</span>), (snap) => {
+    <span class="k">const</span> data = snap.val();
+    state.node1_door.status = data.status;
+    state.node1_door.rfidLog = data.rfidLog || [];
+    <f>renderNode1</f>();
+});
+
+<span class="c">// Listener Node 2 (Gas & Motion)</span>
+<f>onValue</f>(<f>ref</f>(db, <span class="s">'node2'</span>), (snap) => {
+    <span class="k">const</span> data = snap.val();
+    state.node2_safety.gasPPM = data.gasPPM;
+    state.node2_safety.motionDetected = data.motionDetected;
+    <f>renderNode2</f>();
+});
+
+<span class="c">// Listener Node 3 (Lampu & Alarm)</span>
+<f>onValue</f>(<f>ref</f>(db, <span class="s">'node3'</span>), (snap) => {
+    <span class="k">const</span> data = snap.val();
+    state.node3_control.livingRoomLight = data.livingRoomLight;
+    state.node3_control.porchLight = data.porchLight;
+    state.node3_control.alarm.active = data.alarmActive;
+    <f>renderNode3</f>();
+});
+
+<span class="c">// Kirim perintah ke hardware</span>
+<span class="k">function</span> <f>sendCommand</f>(node, action, value) {
+    <f>set</f>(<f>ref</f>(db, <span class="s">`commands/${node}`</span>), {
+        action, value, timestamp: Date.now()
+    });
+}
+
+<span class="c">// Contoh: Toggle lampu dari dashboard</span>
+document.getElementById(<span class="s">'toggle-living").addEventListener("change", (e) => {
+    <f>sendCommand</f>(<span class="s">"node3"</span>, <span class="s">"toggleLivingRoom"</span>, e.target.checked);
+});
+        </div>
+    </div>
+
+    <script>
+        // Test state mirror dari script.js
+        let testState = {
+            n1: { status: 'locked', log: [] },
+            n2: { gas: 245, motion: false },
+            n3: { living: true, porch: false, alarm: false },
+            srv: 'online'
+        };
+
+        function log(panel, msg, type='info') {
+            const el = document.getElementById('log-' + panel);
+            const entry = document.createElement('div');
+            entry.className = 'entry ' + type;
+            entry.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+            el.insertBefore(entry, el.firstChild);
+            if (el.children.length > 15) el.lastChild.remove();
+        }
+
+        function updateMon() {
+            const el = document.getElementById('state-mon');
+            el.innerHTML = `
+<span class="k">Server:</span> <span class="${testState.srv === 'online' ? 'bt' : 'bf'}">${testState.srv}</span><br>
+<span class="k">Node 1:</span><br>
+  <span class="k">  status:</span> <span class="str">${testState.n1.status}</span><br>
+  <span class="k">  lastRFID:</span> <span class="str">${testState.n1.log.slice(-1)[0]?.cardId || 'none'}</span><br>
+<span class="k">Node 2:</span><br>
+  <span class="k">  gasPPM:</span> <span class="num">${testState.n2.gas}</span> <span class="${testState.n2.gas >= 300 ? 'bf' : 'bt'}">${testState.n2.gas >= 300 ? 'DANGER' : 'SAFE'}</span><br>
+  <span class="k">  motion:</span> <span class="${testState.n2.motion ? 'bt' : 'bf'}">${testState.n2.motion}</span><br>
+<span class="k">Node 3:</span><br>
+  <span class="k">  livingRoom:</span> <span class="${testState.n3.living ? 'bt' : 'bf'}">${testState.n3.living}</span><br>
+  <span class="k">  porch:</span> <span class="${testState.n3.porch ? 'bt' : 'bf'}">${testState.n3.porch}</span><br>
+  <span class="k">  alarm:</span> <span class="${testState.n3.alarm ? 'bf' : 'bt'}">${testState.n3.alarm ? 'ACTIVE' : 'OFF'}</span><br>`;
+        }
+
+        function simDoor(status) {
+            testState.n1.status = status;
+            log('n1', `Door ${status}`, 'ok');
+            updateMon();
+        }
+        function simRFID(cardId, name, access) {
+            testState.n1.log.push({cardId, name, access, time: new Date().toLocaleTimeString()});
+            log('n1', `RFID scan ${cardId} ${access ? 'valid' : 'DENIED'}`, access ? 'ok' : 'danger');
+            updateMon();
+        }
+        function simGas(ppm) {
+            testState.n2.gas = ppm;
+            const danger = ppm >= 300;
+            log('n2', `Gas ${ppm} PPM — ${danger ? 'DANGER' : 'SAFE'}`, danger ? 'danger' : 'ok');
+            updateMon();
+        }
+        function simMotion(detected) {
+            testState.n2.motion = detected;
+            log('n2', detected ? 'Motion DETECTED' : 'Motion cleared', detected ? 'warn' : 'ok');
+            updateMon();
+        }
+        function simLight(room, on) {
+            if (room === 'living') testState.n3.living = on;
+            else testState.n3.porch = on;
+            log('n3', `Light ${room} turned ${on ? 'ON' : 'OFF'}`, 'ok');
+            updateMon();
+        }
+        function simAlarm(active) {
+            testState.n3.alarm = active;
+            log('n3', active ? 'ALARM TRIGGERED!' : 'Alarm turned off', active ? 'danger' : 'ok');
+            updateMon();
+        }
+        function simServer(status) {
+            testState.srv = status;
+            log('srv', `Server ${status}`, status === 'online' ? 'ok' : 'danger');
+            updateMon();
+        }
+
+        updateMon();
+        log('srv', 'Test simulator ready', 'ok');
+        log('srv', 'Open index.html for live dashboard', 'ok');
+    </script>
+</body>
+</html>

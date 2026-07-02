@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SENTINEL-X — Smart Home Integrated System Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-bright": "#363941",
+            "on-surface": "#e1e2ec",
+            "surface": "#14171c",
+            "primary": "#adc6ff",
+            "status-ok": "#589e6e",
+            "status-warn": "#cda434",
+            "status-danger": "#c45a5a",
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#14171c] text-[#e1e2ec] font-sans min-h-screen flex flex-col system-grid">
+  <!-- Header -->
+  <header class="bg-[#14171c] border-b border-[#363941] px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+    <div>
+      <h1 class="text-xl font-bold text-[#adc6ff] uppercase tracking-wider">SENTINEL-X</h1>
+      <p class="text-xs text-[#8b919c] uppercase tracking-widest">Smart Home Integrated System — Kelompok X</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2 border border-[#363941] rounded px-3 py-1 bg-[#1a1d24]">
+        <span class="w-2 h-2 rounded-full bg-[#589e6e] animate-pulse"></span>
+        <span class="text-xs text-[#589e6e] uppercase font-bold tracking-wider">ONLINE</span>
+      </div>
+      <div id="clock" class="text-sm font-mono text-[#8b919c] hidden md:block border border-[#363941] rounded px-3 py-1 bg-[#1a1d24]">
+        00:00:00 UTC
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-auto">
+    <div class="max-w-7xl mx-auto p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- CARD 1: Node 1 - Pintu Utama -->
+        <div id="card-node1" class="bg-[#1a1d24] border border-[#363941] rounded-lg flex flex-col overflow-hidden col-span-1">
+          <div class="border-b border-[#363941] bg-[#1a1d24] p-3 flex justify-between items-center">
+            <h2 class="text-xs font-bold text-[#e1e2ec] uppercase tracking-wider">Node 1 - Pintu Utama</h2>
+            <span class="material-symbols-outlined text-[#8b919c] text-sm">sensor_door</span>
+          </div>
+          <div class="p-4 flex-1 flex flex-col gap-4">
+            <div class="flex flex-col items-center justify-center py-6">
+              <span id="door-icon" class="material-symbols-outlined text-4xl text-[#c45a5a] mb-2">lock</span>
+              <div id="door-status" class="text-lg font-mono text-[#c45a5a] uppercase tracking-widest font-bold">TERKUNCI / SECURED</div>
+            </div>
+            <div class="flex-1">
+              <div class="text-xs font-bold text-[#8b919c] uppercase mb-2 tracking-wider">Recent RFID Scans</div>
+              <div id="rfid-log-list" class="border border-[#363941] rounded bg-[#14171c] font-mono text-xs text-[#8b919c] divide-y divide-[#363941]">
+                <div class="px-2 py-1.5 flex justify-between"><span>[16:20:12]</span> <span class="text-[#e1e2ec]">ID:83A12F9B</span></div>
+                <div class="px-2 py-1.5 flex justify-between"><span>[15:05:44]</span> <span class="text-[#e1e2ec]">ID:99B22C1A</span></div>
+                <div class="px-2 py-1.5 flex justify-between text-[#c45a5a]"><span>[11:12:05]</span> <span>ID:UNKNOWN (DENIED)</span></div>
+              </div>
+            </div>
+            <button id="btn-bypass" class="w-full py-2 border border-[#363941] rounded text-xs font-mono text-[#e1e2ec] hover:border-[#adc6ff] hover:text-[#adc6ff] transition-colors bg-[#1a1d24] uppercase cursor-pointer">
+              Bypass / Buka Manual
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: Node 2 - Dapur & Keamanan -->
+        <div id="card-node2" class="bg-[#1e222a] border-2 border-[#589e6e] rounded-lg flex flex-col overflow-hidden col-span-2">
+          <div class="border-b border-[#363941] bg-[#1a1d24] p-3 flex justify-between items-center">
+            <h2 class="text-xs font-bold text-[#e1e2ec] uppercase tracking-wider">Node 2 - Dapur &amp; Keamanan</h2>
+            <span class="material-symbols-outlined text-[#8b919c] text-sm">kitchen</span>
+          </div>
+          <div class="p-4 flex-1 flex flex-col gap-6 justify-center">
+            <!-- Gas Sensor -->
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <div class="text-xs font-bold text-[#8b919c] uppercase tracking-wider">Gas Sensor (MQ-2)</div>
+                <div id="gas-label" class="text-xs font-bold text-[#a7f3c5] px-2 py-0.5 bg-[rgba(88,158,110,0.15)] border border-[#589e6e] rounded uppercase flex items-center gap-1">
+                  <span class="text-[10px]">●</span> AMAN
+                </div>
+              </div>
+              <div id="gas-ppm" class="text-[32px] font-mono text-[#e1e2ec] leading-none mb-3">245 <span class="text-sm text-[#8b919c]">PPM</span></div>
+              <div class="h-2 w-full bg-[#14171c] rounded-full overflow-hidden border border-[#363941]">
+                <div id="gas-bar" class="h-full bg-[#589e6e] transition-all duration-500" style="width:24.5%"></div>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <div id="gas-status-text" class="text-xs font-bold text-[#a7f3c5] uppercase flex items-center gap-1">
+                  <span class="text-[10px]">●</span> Status: Aman
+                </div>
+                <div class="text-xs font-mono text-[#8b919c] opacity-60">
+                  <span>0</span> ... <span>1000 (CRIT)</span>
+                </div>
+              </div>
+            </div>
+              </div>
+            </div>
+            <hr class="border-[#363941]"/>
+            <!-- Motion Sensor -->
+            <div id="pir-card" class="flex items-center justify-between p-3 border border-[#363941] rounded-lg bg-[#1a1d24]">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#8b919c]">motion_sensor_active</span>
+                <div class="text-xs font-bold text-[#e1e2ec] uppercase tracking-wider">Motion Detector</div>
+              </div>
+              <div id="pir-status" class="text-xs font-mono text-[#8b919c] uppercase">CLEAR / IDLE</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3: Node 3 - Pusat Kontrol -->
+        <div id="card-node3" class="bg-[#1a1d24] border border-[#363941] rounded-lg flex flex-col overflow-hidden col-span-1">
+          <div class="border-b border-[#363941] bg-[#1a1d24] p-3 flex justify-between items-center">
+            <h2 class="text-xs font-bold text-[#e1e2ec] uppercase tracking-wider">Node 3 - Pusat Kontrol</h2>
+            <span class="material-symbols-outlined text-[#8b919c] text-sm">hub</span>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <!-- Light Toggles -->
+            <div class="space-y-3">
+              <div class="text-xs font-bold text-[#8b919c] uppercase tracking-wider mb-1">Lighting Control</div>
+              <div class="flex justify-between items-center p-3 border border-[#363941] rounded-lg bg-[#14171c]">
+                <span class="text-xs font-mono text-[#e1e2ec] uppercase">Lampu Ruang Tamu</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input id="toggle-living" type="checkbox" class="sr-only peer" checked/>
+                  <div class="w-9 h-5 bg-[#363941] rounded-full peer peer-checked:bg-[#adc6ff] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                </label>
+              </div>
+              <div class="flex justify-between items-center p-3 border border-[#363941] rounded-lg bg-[#14171c]">
+                <span class="text-xs font-mono text-[#e1e2ec] uppercase">Lampu Teras</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input id="toggle-porch" type="checkbox" class="sr-only peer"/>
+                  <div class="w-9 h-5 bg-[#363941] rounded-full peer peer-checked:bg-[#adc6ff] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                </label>
+              </div>
+            </div>
+            <!-- Alarm Status -->
+            <div class="mt-4 pt-4 border-t border-[#363941]">
+              <div class="text-xs font-bold text-[#8b919c] uppercase tracking-wider mb-3">Security System</div>
+              <div id="alarm-card" class="flex items-center justify-between p-3 border border-[#363941] rounded-lg bg-[#14171c] mb-3">
+                <div class="flex items-center gap-3">
+                  <span id="alarm-icon" class="material-symbols-outlined text-[#8b919c]">notifications_off</span>
+                  <span id="alarm-status" class="text-xs font-mono text-[#8b919c] uppercase">ALARM MATI</span>
+                </div>
+              </div>
+              <button id="btn-mute" class="w-full py-2 border border-[#363941] rounded text-xs font-mono text-[#e1e2ec] hover:border-[#adc6ff] hover:text-[#adc6ff] transition-colors bg-[#1a1d24] uppercase cursor-pointer">
+                Mute / Reset Alarm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Global Activity Log (Footer) -->
+      <div class="mt-6 bg-[#1a1d24] border border-[#363941] rounded-lg overflow-hidden">
+        <div class="border-b border-[#363941] bg-[#1a1d24] p-3">
+          <h2 class="text-xs font-bold text-[#e1e2ec] uppercase tracking-wider">Global Activity Log</h2>
+        </div>
+        <div id="activity-log" class="p-4 bg-[#14171c] font-mono text-xs text-[#8b919c] space-y-2 max-h-[200px] overflow-y-auto">
+          <div class="flex gap-4"><span class="w-20 shrink-0">[14:21:05]</span> <span>Node 3: Lighting 'Lampu Ruang Tamu' turned ON</span></div>
+          <div class="flex gap-4"><span class="w-20 shrink-0">[14:18:22]</span> <span>Node 2: Motion detected in Kitchen (Cleared)</span></div>
+          <div class="flex gap-4 text-[#cda434]"><span class="w-20 shrink-0">[14:15:10]</span> <span>Node 2: WARNING - Gas level elevated (245 PPM)</span></div>
+          <div class="flex gap-4"><span class="w-20 shrink-0">[14:02:44]</span> <span>Node 1: Door secured manually</span></div>
+          <div class="flex gap-4"><span class="w-20 shrink-0">[13:45:12]</span> <span>System: Routine diagnostic completed</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

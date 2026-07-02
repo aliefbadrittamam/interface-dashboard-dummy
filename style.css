@@ -1,0 +1,121 @@
+/* =========================================================
+   SENTINEL-X — Smart Home Integrated System Dashboard
+   Styling: Industrial/Dark Control Room Aesthetic
+   Ref: 02-DESIGN-BRIEF.md (Anti AI-Slop)
+   ========================================================= */
+
+/* ─── Base ─── */
+html, body {
+    font-family: 'Space Grotesk', -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background-color: #14171c;
+    color: #e1e2ec;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.selection\:bg-primary-container ::selection {
+    background-color: #4d8eff;
+    color: #00285d;
+}
+
+/* ─── Grid Background Pattern ─── */
+.system-grid {
+    background-image:
+        linear-gradient(to right, rgba(140, 144, 159, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(140, 144, 159, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-color: #14171c;
+}
+
+/* ─── Status Color Utilities ─── */
+.text-status-ok { color: #a7f3c5; }
+.text-status-warn { color: #ffb786; }
+.text-status-danger { color: #ffb4ab; }
+.bg-status-ok { background-color: rgba(88, 158, 110, 0.2); border-color: #589e6e; }
+.bg-status-danger { background-color: rgba(196, 90, 90, 0.25); border-color: #ef4444; }
+.bg-status-warn { background-color: rgba(205, 164, 52, 0.2); border-color: #cda434; }
+
+/* ─── Direct Color Utilities (Backup for Tailwind runtime issues) ─── */
+.text-ok { color: #a7f3c5 !important; }
+.text-warn { color: #ffb786 !important; }
+.text-danger { color: #ffb4ab !important; }
+.text-muted { color: #8b919c !important; }
+.text-default { color: #e1e2ec !important; }
+
+/* ─── Material Icons Override ─── */
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+/* ─── Animations ─── */
+@keyframes pulseDanger {
+    0%, 100% { box-shadow: 0 0 5px rgba(196, 90, 90, 0.15); border-color: #c45a5a; }
+    50% { box-shadow: 0 0 15px rgba(196, 90, 90, 0.4); border-color: #ff6b6b; }
+}
+
+@keyframes pulseDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.gas-danger {
+    animation: pulseDanger 2s infinite;
+}
+
+.pulse-dot {
+    animation: pulseDot 2s infinite;
+}
+
+/* ─── Activity Log ─── */
+#activity-log {
+    max-height: 200px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+#activity-log::-webkit-scrollbar { width: 6px; }
+#activity-log::-webkit-scrollbar-track { background: #14171c; }
+#activity-log::-webkit-scrollbar-thumb { background: #363941; border-radius: 3px; }
+
+.log-entry {
+    display: flex;
+    gap: 16px;
+    padding: 3px 0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 20px;
+    color: #8b919c;
+}
+
+.log-entry .timestamp {
+    width: 80px;
+    flex-shrink: 0;
+    color: #6b7180;
+}
+
+.log-entry.ok { color: #589e6e; }
+.log-entry.warn { color: #cda434; }
+.log-entry.danger { color: #c45a5a; }
+
+/* ─── Toggle Switch ─── */
+.toggle-checkbox:checked + .toggle-label .toggle-bg { background-color: #adc6ff; }
+.toggle-checkbox:checked + .toggle-label .toggle-knob { transform: translateX(16px); }
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .card--safety { grid-column: span 1 / span 1; }
+}
+
+@media (max-width: 768px) {
+    header nav { display: none; }
+    .header-actions { gap: 8px; }
+}
